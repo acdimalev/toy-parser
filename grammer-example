@@ -5,7 +5,7 @@ from parse import *
 envfile = Grammer({
     'name', 'value', 'assignment', 'whitespace', 'comment', 'line', 'document',
 })
-envfile.define({
+define_grammer(envfile, {
     'name': Sequence([
         OneOf([
             Range('A', 'Z'),

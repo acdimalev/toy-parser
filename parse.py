@@ -151,6 +151,8 @@ class Grammer:
             "{}: {} ;".format(term, parser)
             for (term, parser) in self._parsers.items()
         )
-    def define(self, grammer):
-        for (term, parser) in grammer.items():
-            self._parsers[term] = parser
+
+
+def define_grammer(grammer, definition):
+    for (term, parser) in definition.items():
+        grammer._parsers[term] = parser
