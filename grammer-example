@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+
+from parse import *
+
+envfile = Grammer({
+    'name', 'value', 'assignment', 'whitespace', 'comment', 'line', 'document',
+})
+envfile.define({
+    'name': Sequence([
+        OneOf([
+            Range('A', 'Z'),
+            Literal('_'),
+            Range('a', 'z'),
+        ]),
+        Many(OneOf([
+            Range('0', '9'),
+            Range('A', 'Z'),
+            Literal('_'),
+            Range('a', 'z'),
+        ])),
+    ]),
+    'value': Sequence([]),
+    'assignment': Sequence([envfile.name, Literal('='), envfile.value]),
+    'whitespace': Many(OneOf(map(Literal, " \t"))),
+    'comment': Sequence([]),
+    'line': Sequence([
+        envfile.whitespace,
+        Optional(envfile.assignment),
+        envfile.whitespace,
+        Optional(envfile.comment),
+        Literal('\n'),
+    ]),
+    'document': Many(envfile.line),
+})
+
+
+def test(parser, document):
+    print('---')
+    print('Matching: ', parser)
+    print('In: ', repr(document))
+    print('Result: ', parser.parse(document))
+
+
+print(envfile)
+test(envfile.line, "Hello1=\n")
+test(envfile.document, "Hello1=\n  foo=  \n")
+
+# IterMany(envfile.line)

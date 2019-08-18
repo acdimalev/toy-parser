@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+from parse import *
+
+name = Sequence([
+    OneOf([
+        Range('A', 'Z'),
+        Literal('_'),
+        Range('a', 'z'),
+    ]),
+    Many(OneOf([
+        Range('0', '9'),
+        Range('A', 'Z'),
+        Literal('_'),
+        Range('a', 'z'),
+    ])),
+])
+
+
+def test(parser, document):
+    print('---')
+    print('Matching: ', parser)
+    print('In: ', document)
+    print('Result: ', parser.parse(document))
+
+
+name = Map(name, lambda x: x[0] + ''.join(x[1]))
+
+test(name, "Hello1=foo")
+test(name, "Oh?what=fun")
+
+assignment = Sequence([name, Literal('=')])
+
+test(assignment, "Hello1=foo")
+test(assignment, "Oh?what=fun")
