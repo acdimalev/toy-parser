@@ -107,9 +107,9 @@ class Optional(Parser):
         return "[ {} ]".format(self.child)
     def parse(self, document):
         result = self.child.parse(document)
-        if ParseError == type(result):
-            return ParseOk("", document)
-        return result
+        if ParseOk == type(result):
+            return ParseOk([result.matched], result.remaining)
+        return ParseOk([], document)
 
 
 class Map(Parser):
