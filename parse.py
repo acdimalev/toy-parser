@@ -164,3 +164,11 @@ class Grammer:
             "{}: {} ;".format(term, parser)
             for (term, parser) in self._parsers.items()
         )
+
+
+def transform(grammer, maps):
+    definition = grammer._definition
+    return Grammer(lambda grammer: {
+        term: Map(parser, maps.get(term, lambda x: x))
+        for (term, parser) in definition(grammer).items()
+    })
