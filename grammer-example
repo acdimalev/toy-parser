@@ -2,10 +2,7 @@
 
 from parse import *
 
-envfile = Grammer({
-    'name', 'value', 'assignment', 'whitespace', 'comment', 'line', 'document',
-})
-define_grammer(envfile, {
+envfile = Grammer(lambda envfile: {
     'name': Sequence([
         OneOf([
             Range('A', 'Z'),

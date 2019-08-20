@@ -135,10 +135,23 @@ class GrammerParser(Parser):
         return self.grammer._parsers[self.term].parse(document)
 
 
+class GrammerBuilder:
+    def __init__(self, grammer):
+        self._grammer = grammer
+        self._terms = {}
+    def __getattr__(self, name):
+        if name not in self._terms:
+            self._terms[name] = GrammerParser(self._grammer, name)
+        return self._terms[name]
+
+
 class Grammer:
-    def __init__(self, terms):
-        self._terms = {term: GrammerParser(self, term) for term in terms}
-        self._parsers = {term: None for term in terms}
+    def __init__(self, definition):
+        builder = GrammerBuilder(self)
+        parsers = definition(builder)
+        self._definition = definition
+        self._parsers = parsers
+        self._terms = {term: GrammerParser(self, term) for term in parsers}
     def __getattr__(self, name):
         if name in self._terms:
             return self._terms[name]
@@ -151,8 +164,3 @@ class Grammer:
             "{}: {} ;".format(term, parser)
             for (term, parser) in self._parsers.items()
         )
-
-
-def define_grammer(grammer, definition):
-    for (term, parser) in definition.items():
-        grammer._parsers[term] = parser
