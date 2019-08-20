@@ -43,13 +43,23 @@ class Range(Parser):
         self.first = first
         self.last = last
     def __str__(self):
-        return "{!r}-{!r}".format(self.first, self.last)
+        return "{!r}..{!r}".format(self.first, self.last)
     def parse(self, document):
         (head, tail) = (document[:1], document[1:])
         if self.first <= head <= self.last:
             return ParseOk(head, tail)
         else:
             return ParseError("Expected {} found {!r}".format(self, head))
+
+
+class Any(Parser):
+    def __str__(self):
+        return "? any ?"
+    def parse(self, document):
+        (head, tail) = (document[:1], document[1:])
+        if "" == head:
+            return ParseError("Expected any found end of document")
+        return ParseOk(head, tail)
 
 
 class OneOf(Parser):
@@ -110,6 +120,19 @@ class Optional(Parser):
         if ParseOk == type(result):
             return ParseOk([result.matched], result.remaining)
         return ParseOk([], document)
+
+
+class Less(Parser):
+    def __init__(self, exception, rule):
+        self.exception = exception
+        self.rule = rule
+    def __str__(self):
+        return "{} - {}".format(self.rule, self.exception)
+    def parse(self, document):
+        result = self.exception.parse(document)
+        if ParseOk == type(result):
+            return ParseError("Found {!r}".format(result.matched))
+        return self.rule.parse(document)
 
 
 class Map(Parser):
